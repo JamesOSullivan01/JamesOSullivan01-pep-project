@@ -90,10 +90,10 @@ public class SocialMediaController {
         // System.out.println("id: " + id);
         Message message = messageService.deleteMessage(message_id);
             if(message == null){
-                System.out.println("message: " + message);
+                // System.out.println("message: " + message);
                 ctx.status(200);
             } else {
-                ctx.status(404);
+                ctx.json(message);
             }
 
     }
