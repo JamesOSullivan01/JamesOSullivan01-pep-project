@@ -1,6 +1,7 @@
 package Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Account;
@@ -50,6 +51,9 @@ public class SocialMediaController {
         // As a user, I should be able to submit a GET request on the endpoint 
         // GET localhost:8080/accounts/{account_id}/messages.
         app.get("/accounts/{account_id}/messages", this::getAllMesagesFromAUser);
+        // ## 2: Our API should be able to process User logins.
+        // As a user, I should be able to verify my login on the endpoint POST localhost:8080/login.
+        app.post("/login", this::loginUser);
         return app;
     }
 
@@ -78,23 +82,10 @@ public class SocialMediaController {
     }
         //DELETE localhost:8080/messages/{message_id}
 //         //## 6: Our API should be able to delete a message identified by a message ID.
-
-// As a User, I should be able to submit a DELETE request on the endpoint DELETE localhost:8080/messages/{message_id}.
-
-// - The deletion of an existing message should remove an existing message from the database. If the message existed,
-//  the response body should contain the now-deleted message. The response status should be 200, which is the default.
-// - If the message did not exist, the response status should be 200, but the response body should be empty. 
-// This is because the DELETE verb is intended to be idempotent, ie, multiple calls to the DELETE endpoint should respond with
-//  the same type of response.
     private void deleteMessage(Context ctx) throws JsonProcessingException { 
-        
-        // String id = ctx.pathParam("message_id");
-        //     ctx.result(message_id);
         int message_id = Integer.valueOf(ctx.pathParam("message_id"));
-        // System.out.println("id: " + id);
         Message message = messageService.deleteMessage(message_id);
             if(message == null){
-                // System.out.println("message: " + message);
                 ctx.status(200);
             } else {
                 ctx.json(message);
@@ -103,30 +94,40 @@ public class SocialMediaController {
     }
 
     // ## 4: Our API should be able to retrieve all messages.
-
-// As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
-// - The response body should contain a JSON representation of a list containing all messages retrieved from the database. 
-// It is expected for the list to simply be empty if there are no messages. The response status should always be 200, 
-// which is the default.
-
-    private void getAllMessages(Context ctx){
+        private void getAllMessages(Context ctx){
         List<Message> allMessages = messageService.listOfAllMessages();
         ctx.json(allMessages);
         
     }
     // ## 8: Our API should be able to retrieve all messages written by a particular user.
-
-// As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/accounts/{account_id}/messages.
-
-// - The response body should contain a JSON representation of a list containing all messages posted by 
-// a particular user, which is retrieved from the database. It is expected for the list to simply be 
-// empty if there are no messages. The response status should always be 200, which is the default.
-
     private void getAllMesagesFromAUser(Context ctx) throws JsonProcessingException {
         int account_id = Integer.valueOf(ctx.pathParam("account_id"));
        List<Message> allMessagesFromUser = messageService.listOfMessagesFromUser(account_id);
        ctx.json(allMessagesFromUser);
 }
 
+// ## 2: Our API should be able to process User logins.
 
+// As a user, I should be able to verify my login on the endpoint POST localhost:8080/login. 
+// The request body will contain a JSON representation of an Account, not containing an account_id. 
+// In the future, this action may generate a Session token to allow the user to securely use the site.
+//  We will not worry about this for now.
+
+// - The login will be successful if and only if the username and password provided in the request 
+// body JSON match a real account existing on the database. If successful, the response body should 
+// contain a JSON of the account in the response body, including its account_id. The response status 
+// should be 200 OK, which is the default.
+// - If the login is not successful, the response status should be 401. (Unauthorized)
+
+    private void loginUser(Context ctx) throws JsonMappingException, JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account loggedInAccount = accountService.loginToAccount(account);
+        if (loggedInAccount != null) {
+            ctx.json(mapper.writeValueAsString(loggedInAccount));
+        } else {
+            ctx.status(401); 
+        }
+        
+    }
 }

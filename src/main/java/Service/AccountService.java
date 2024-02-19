@@ -22,4 +22,9 @@ public class AccountService {
             return null;
         }
     }
+
+    public Account loginToAccount(Account account){
+        Account AccountToLogin = accountDao.loginToAccount(account);
+        return AccountToLogin;
+    }
 }
