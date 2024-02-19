@@ -36,14 +36,8 @@ public Message addMessage(Message message){
     }
 
     public List<Message> listOfMessagesFromUser(int accountId) {
-        List<Message> allMessages = messageDao.getAllMessages(); 
-        List<Message> messagesFromUser = new ArrayList<>();
-        for (Message message : allMessages) {
-            if (message.getPosted_by() == accountId) {
-                messagesFromUser.add(message);
-            }
-        }
-        return messagesFromUser;
+        List<Message> messagesFromUser = null;  
+        return messageDao.getAllMessagesFromUser(accountId);
     }
 
         // ## 4: Our API should be able to retrieve all messages.

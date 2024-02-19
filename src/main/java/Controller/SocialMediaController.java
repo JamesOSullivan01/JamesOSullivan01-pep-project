@@ -47,6 +47,9 @@ public class SocialMediaController {
         app.delete("/messages/{message_id}",this::deleteMessage);
         // As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
         app.get("/messages", this::getAllMessages);
+        // As a user, I should be able to submit a GET request on the endpoint 
+        // GET localhost:8080/accounts/{account_id}/messages.
+        app.get("/accounts/{account_id}/messages", this::getAllMesagesFromAUser);
         return app;
     }
 
@@ -111,20 +114,18 @@ public class SocialMediaController {
         ctx.json(allMessages);
         
     }
+    // ## 8: Our API should be able to retrieve all messages written by a particular user.
+
+// As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/accounts/{account_id}/messages.
+
+// - The response body should contain a JSON representation of a list containing all messages posted by 
+// a particular user, which is retrieved from the database. It is expected for the list to simply be 
+// empty if there are no messages. The response status should always be 200, which is the default.
 
     private void getAllMesagesFromAUser(Context ctx) throws JsonProcessingException {
-        String accountIdParam = ctx.queryParam("posted_by");
-        if (accountIdParam == null) {
-            ctx.status(400);
-            return;
-        }
-        try {
-            int accountId = Integer.parseInt(accountIdParam);
-            List<Message> messagesFromUser = messageService.listOfMessagesFromUser(accountId);
-            ctx.json(messagesFromUser);
-        } catch (NumberFormatException e) {
-            ctx.status(400);
-        }
+        int account_id = Integer.valueOf(ctx.pathParam("account_id"));
+       List<Message> allMessagesFromUser = messageService.listOfMessagesFromUser(account_id);
+       ctx.json(allMessagesFromUser);
 }
 
 
