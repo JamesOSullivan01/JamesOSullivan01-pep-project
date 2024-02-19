@@ -45,7 +45,8 @@ public class SocialMediaController {
         app.post("/messages", this::createMessage);
         //DELETE localhost:8080/messages/{message_id}
         app.delete("/messages/{message_id}",this::deleteMessage);
-        app.get("/accounts", this::getAllMesagesFromAUser);
+        // As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
+        app.get("/messages", this::getAllMessages);
         return app;
     }
 
@@ -98,6 +99,19 @@ public class SocialMediaController {
 
     }
 
+    // ## 4: Our API should be able to retrieve all messages.
+
+// As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
+// - The response body should contain a JSON representation of a list containing all messages retrieved from the database. 
+// It is expected for the list to simply be empty if there are no messages. The response status should always be 200, 
+// which is the default.
+
+    private void getAllMessages(Context ctx){
+        List<Message> allMessages = messageService.listOfAllMessages();
+        ctx.json(allMessages);
+        
+    }
+
     private void getAllMesagesFromAUser(Context ctx) throws JsonProcessingException {
         String accountIdParam = ctx.queryParam("posted_by");
         if (accountIdParam == null) {
@@ -111,7 +125,7 @@ public class SocialMediaController {
         } catch (NumberFormatException e) {
             ctx.status(400);
         }
-    
-    
 }
+
+
 }
