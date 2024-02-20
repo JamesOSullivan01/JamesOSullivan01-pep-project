@@ -129,5 +129,25 @@ public class MessageDAO {
         return messages;
     }
 
+    public Message getMessageBuId(int messageId){
+        Message message = null;
+        try{
+            String SQL = " Select * FROM message where message_id = ?";
+            PreparedStatement ps = connection.prepareStatement(SQL);
+            ps.setInt(1, messageId);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                message = new Message(
+                    rs.getInt("message_id"),
+                    rs.getInt("posted_by"),
+                    rs.getString("message_text"),
+                    rs.getInt("time_posted_epoch"));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return message;
+    }
 
 }

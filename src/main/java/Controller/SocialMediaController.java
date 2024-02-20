@@ -54,6 +54,10 @@ public class SocialMediaController {
         // ## 2: Our API should be able to process User logins.
         // As a user, I should be able to verify my login on the endpoint POST localhost:8080/login.
         app.post("/login", this::loginUser);
+        // As a user, I should be able to submit a GET request on the endpoint 
+        // GET localhost:8080/messages/{message_id}.
+        app.get("/messages/{message_id}", this::getMessagesById);
+
         return app;
     }
 
@@ -106,19 +110,6 @@ public class SocialMediaController {
        ctx.json(allMessagesFromUser);
 }
 
-// ## 2: Our API should be able to process User logins.
-
-// As a user, I should be able to verify my login on the endpoint POST localhost:8080/login. 
-// The request body will contain a JSON representation of an Account, not containing an account_id. 
-// In the future, this action may generate a Session token to allow the user to securely use the site.
-//  We will not worry about this for now.
-
-// - The login will be successful if and only if the username and password provided in the request 
-// body JSON match a real account existing on the database. If successful, the response body should 
-// contain a JSON of the account in the response body, including its account_id. The response status 
-// should be 200 OK, which is the default.
-// - If the login is not successful, the response status should be 401. (Unauthorized)
-
     private void loginUser(Context ctx) throws JsonMappingException, JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
@@ -129,5 +120,24 @@ public class SocialMediaController {
             ctx.status(401); 
         }
         
+    }
+    // ## 5: Our API should be able to retrieve a message by its ID.
+
+// As a user, I should be able to submit a GET request on the endpoint 
+// GET localhost:8080/messages/{message_id}.
+
+// - The response body should contain a JSON representation of the message identified 
+// by the message_id. It is expected for the response body to simply be empty if there is 
+// no such message. The response status should always be 200, which is the default.
+
+    private void getMessagesById(Context ctx){
+        int message_id = Integer.valueOf(ctx.pathParam("message_id"));
+        Message message = messageService.getMessageById(message_id);
+        if (message != null) {
+            ctx.json(message);
+        } else {
+            ctx.status(200);
+            message = null;
+    }
     }
 }
