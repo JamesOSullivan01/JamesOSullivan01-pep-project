@@ -157,10 +157,13 @@ public class SocialMediaController {
 // - If the update of the message is not successful for any reason, the response status should be 400. (Client error)
 
 private void updateMessage(Context ctx) throws JsonProcessingException {
+    ObjectMapper obj = new ObjectMapper();
     int messageId = Integer.valueOf(ctx.pathParam("message_id"));
-    String newMessageText = ctx.body();
-    
-    if (newMessageText.isEmpty() && newMessageText.length() <=255 ) {
+
+    Message newMessage = obj.readValue(ctx.body(), Message.class);
+    String newMessageText = newMessage.getMessage_text();
+        if (!newMessageText.isEmpty() && newMessageText.length() <=255 ) {
+        
         Message updatedMessage = messageService.updateMessage(messageId, newMessageText);
         if (updatedMessage != null) {
             ctx.status(200);
