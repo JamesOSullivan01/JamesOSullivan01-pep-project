@@ -129,25 +129,48 @@ public class MessageDAO {
         return messages;
     }
 
-    public Message getMessageBuId(int messageId){
-        Message message = null;
-        try{
-            String SQL = " Select * FROM message where message_id = ?";
+    // public Message getMessageById(int messageId){
+    //     Message message = null;
+    //     try{
+    //         String SQL = " Select * FROM message where message_id = ?";
+    //         PreparedStatement ps = connection.prepareStatement(SQL);
+    //         ps.setInt(1, messageId);
+    //         ResultSet rs = ps.executeQuery();
+    //         while(rs.next()){
+    //             message = new Message(
+    //                 rs.getInt("message_id"),
+    //                 rs.getInt("posted_by"),
+    //                 rs.getString("message_text"),
+    //                 rs.getInt("time_posted_epoch"));
+    //         }
+    //     } catch (Exception e){
+    //         e.printStackTrace();
+    //         return null;
+    //     }
+    //     return message;
+    // }
+
+    public Message updateMessage(int messageId, String messageText){
+        try {
+            String SQL = "UPDATE message SET message_text = ? WHERE message_id = ?";
             PreparedStatement ps = connection.prepareStatement(SQL);
-            ps.setInt(1, messageId);
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-                message = new Message(
-                    rs.getInt("message_id"),
-                    rs.getInt("posted_by"),
-                    rs.getString("message_text"),
-                    rs.getInt("time_posted_epoch"));
+            ps.setString(1, messageText);
+            ps.setInt(2, messageId);
+            
+            int rowsAffected = ps.executeUpdate();
+            
+            if (rowsAffected > 0) {
+             
+                return getMessageById(messageId);
+            } else {
+                
+                return null;
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return null; 
         }
-        return message;
     }
+
 
 }
